@@ -11,6 +11,7 @@ public class Boggle
 {
 	static List<String> dictionary = new ArrayList<String>();
 	static List<Die>    dice       = new ArrayList<Die>();
+	static Tree			tree	   = new Tree();
 	
 	private static void readDictionary()
 	{
@@ -21,7 +22,8 @@ public class Boggle
 			for( String string : dictionaryString )
 			{
 				string.replaceAll( "qu", "q" );
-				dictionary.addAll( Arrays.asList( string.split( "\\s+" ) ) );
+				
+				dictionary.addAll( Arrays.asList( string.toLowerCase().split( "\\s+" ) ) );
 			}
 			
 			Collections.sort( dictionary );
@@ -55,6 +57,8 @@ public class Boggle
 	{
 		readDictionary();
 		readDice();
+		
+		tree.loadDictionary( dictionary );
 		
 		Board board = new Board( dice );
 		

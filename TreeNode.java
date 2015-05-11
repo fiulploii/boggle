@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class TreeNode 
@@ -6,38 +7,40 @@ public class TreeNode
 	public Integer count = 0;
 	public boolean isLastLetter = false;
 	
-	List<TreeNode> children;
+	List<TreeNode> children = new ArrayList<TreeNode>();
 
 	public TreeNode( char letter )
 	{
 		this.letter = letter;
-		this.count++;
 	}
 	
 	public void addWord( String word ) 
 	{
-		char letter = word.charAt( 0 );
-		boolean isNewLetter = true;
-
 		if( word.length() == 0 )
 		{
 			isLastLetter = true;
 			return;
 		}
-		
+
+		char letter = word.charAt( 0 );
+		TreeNode letterNode = null;
+
 		for( TreeNode node : children )
 		{
 			if( node.letter == letter )
 			{
-				node.count++;
-				node.addWord( word.substring( 1 ) );
-				isNewLetter = false;
+				letterNode = node;
+				break;
 			}
 		}
 		
-		if( isNewLetter )
+		if( letterNode == null )
 		{
-			children.add( new TreeNode( letter ) );
+			letterNode = new TreeNode( letter );
+			children.add( letterNode );
 		}
+		
+		letterNode.count++;
+		letterNode.addWord( word.substring( 1 ) );
 	}
 }
