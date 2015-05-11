@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class TreeNode 
 {
@@ -7,7 +6,7 @@ public class TreeNode
 	public Integer count = 0;
 	public boolean isLastLetter = false;
 	
-	List<TreeNode> children = new ArrayList<TreeNode>();
+	HashMap<Character,TreeNode> children = new HashMap<Character,TreeNode>();
 
 	public TreeNode( char letter )
 	{
@@ -22,22 +21,15 @@ public class TreeNode
 			return;
 		}
 
-		char letter = word.charAt( 0 );
+		Character letter = Character.valueOf( word.charAt( 0 ) );
 		TreeNode letterNode = null;
 
-		for( TreeNode node : children )
-		{
-			if( node.letter == letter )
-			{
-				letterNode = node;
-				break;
-			}
-		}
+		letterNode = children.get( letter ) ;
 		
 		if( letterNode == null )
 		{
 			letterNode = new TreeNode( letter );
-			children.add( letterNode );
+			children.put( letter, letterNode );
 		}
 		
 		letterNode.count++;

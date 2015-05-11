@@ -61,7 +61,8 @@ public class Boggle
 		tree.loadDictionary( dictionary );
 		
 		Board board = new Board( dice );
-		
 		System.out.println( board );
+		
+		board.solve( tree.root );
 	}
 }
