@@ -16,7 +16,7 @@ public class Boggle
 	{
 		try 
 		{
-			List<String> dictionaryString = Files.readAllLines( Paths.get( "src/Dictionary.txt" ), Charset.defaultCharset() );
+			List<String> dictionaryString = Files.readAllLines( Paths.get( "Dictionary.txt" ), Charset.defaultCharset() );
 			
 			for( String string : dictionaryString )
 			{
@@ -37,7 +37,7 @@ public class Boggle
 		List<String> diceString;
 		try 
 		{
-			diceString = Files.readAllLines( Paths.get( "src/Dice.txt" ), Charset.defaultCharset() );
+			diceString = Files.readAllLines( Paths.get( "Dice.txt" ), Charset.defaultCharset() );
 			
 			int id = 0;
 			for( String string : diceString )
