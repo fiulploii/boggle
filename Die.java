@@ -35,7 +35,7 @@ public class Die
 	
 	void solve( TreeNode subtree, Board board, String prefix )
 	{
-		if( used )
+		if( used || subtree == null )
 		{
 			return;
 		}

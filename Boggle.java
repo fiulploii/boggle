@@ -53,18 +53,43 @@ public class Boggle
 		}
 	}
 	
+	private static void resetDiceWords()
+	{
+		for( Die die : dice )
+		{
+			die.words.clear();
+		}
+	}
+	
+	private static void readDiceFromString( String string )
+	{
+		string.trim();
+		
+		if( string.length() != 25 )
+		{
+			return;
+		}
+		
+		dice.clear();
+		
+	}
+	
 	public static void main(String[] args) 
 	{
 		readDictionary();
 		readDice();
 		
 		tree.loadDictionary( dictionary );
-		tree.print();
+//		tree.print();
 		
-		Board board = new Board( dice );
-		System.out.println( board );
-		
-		board.solve( tree.root );
-		board.printScore();
+		for( int idx = 0; idx < 100; idx++ )
+		{
+			resetDiceWords();
+			Board board = new Board( dice );
+			System.out.println( board );
+			
+			board.solve( tree.root );
+			board.printScore();
+		}
 	}
 }

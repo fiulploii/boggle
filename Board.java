@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -96,6 +95,8 @@ public class Board
 				die.solve( tree.children.get( die.getChar() ), this, "" );
 			}
 		}
+		
+		resetUsedFlag();
 	}
 	
 	public void printScore()
