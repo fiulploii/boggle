@@ -6,6 +6,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.sun.xml.internal.ws.util.StringUtils;
+
 public class Board 
 {
 	List<Die> dice;
@@ -13,7 +15,7 @@ public class Board
 	Board( List<Die> diceList )
 	{
 		dice = diceList;
-		final long randomSeed = 0x12345;
+		final long randomSeed = 0x99999;
 		
 		Random random = new Random( randomSeed );
 		
@@ -30,6 +32,37 @@ public class Board
 		}
 	}
 	
+	public void readFromString( String string )
+	{
+		string.trim();
+		string.replaceAll( " \n", "" );
+		
+		if( string.length() != 25 )
+		{
+			System.out.println( string + " is not a valid board definition" );
+			return;
+		}
+		
+		dice.clear();
+		char[] temp = new char[6];
+		for( int idx = 0; idx < string.length(); idx++ )
+		{
+			Arrays.fill( temp, string.charAt( idx ) );
+			String face = new String( temp );
+			dice.add( new Die( face, idx ) );
+		}
+		
+		for( int x = 0; x < 5; x++ )
+		{
+			for( int y = 0; y < 5; y++ )
+			{
+				get( x, y ).roll( 1 );
+				get( x, y ).x = x;
+				get( x, y ).y = y;
+			}
+		}
+	}
+
 	public String toString()
 	{
 		String string = new String();
@@ -99,7 +132,7 @@ public class Board
 		resetUsedFlag();
 	}
 	
-	public void printScore()
+	public int printScore( boolean toConsole )
 	{
 		int score = 0;
 		List<String> allWords = new ArrayList<String>();
@@ -123,8 +156,12 @@ public class Board
 			score += scoreTable.get( word.length() );
 		}
 		
-		System.out.println( wordSet );
+		if( toConsole )
+		{
+			System.out.println( wordSet );
+			System.out.println( "Score: " + score );
+		}
 		
-		System.out.println( "Score: " + score );
+		return score;
 	}
 }

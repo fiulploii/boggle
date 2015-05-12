@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Date;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -61,35 +62,55 @@ public class Boggle
 		}
 	}
 	
-	private static void readDiceFromString( String string )
-	{
-		string.trim();
-		
-		if( string.length() != 25 )
-		{
-			return;
-		}
-		
-		dice.clear();
-		
-	}
-	
 	public static void main(String[] args) 
 	{
+		int maxScore = 0;
+		
 		readDictionary();
 		readDice();
 		
 		tree.loadDictionary( dictionary );
-//		tree.print();
+
+		/*
+		int iterations = 100000;
+		int increment = iterations / 100 * 5;
 		
-		for( int idx = 0; idx < 100; idx++ )
+		System.out.println( "Started " + iterations + " iterations at " + new Date() );
+		System.out.println( "\n0___________________100" );
+		*/
+		Board bestBoard = new Board( dice );
+		bestBoard.readFromString( "renotvsticieraldgnephtcdb" );
+		System.out.println( bestBoard );
+		bestBoard.solve( tree.root );
+		bestBoard.printScore( true );
+		
+		/*
+		for( int idx = 0; idx < iterations; idx++ )
 		{
 			resetDiceWords();
 			Board board = new Board( dice );
-			System.out.println( board );
+			//System.out.println( board );
 			
 			board.solve( tree.root );
-			board.printScore();
+			int score = board.printScore( false );
+			
+			if( score > maxScore )
+			{
+				maxScore = score;
+				bestBoard = board;
+				
+				System.out.println( bestBoard );
+			}
+			
+			if( ( idx + 1 )% increment == 0 )
+			{
+				//System.out.print( "#");
+			}
 		}
+		
+		System.out.println( "\n\nFinished " + iterations + " iterations at " + new Date() );
+		System.out.println( "\n----------------------------------\nMax Score: " + maxScore );
+		
+		*/
 	}
 }
