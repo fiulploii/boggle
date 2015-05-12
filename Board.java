@@ -14,7 +14,7 @@ public class Board
 	Board( List<Die> diceList )
 	{
 		dice = diceList;
-		final long randomSeed = 0x111123;
+		final long randomSeed = 0x12345;
 		
 		Random random = new Random( randomSeed );
 		

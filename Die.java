@@ -39,12 +39,14 @@ public class Die
 		{
 			return;
 		}
-		else
-		{
-			used = true;
-		}
-		
+
+		used = true;
 		prefix += this.toString();
+
+		if( subtree.isLastLetter == true )
+		{
+			words.add( prefix );
+		}
 		
 		List<Die> neighbours = board.getNeighbours( x, y );
 		
@@ -55,11 +57,6 @@ public class Die
 			if( nextTree == null )
 			{
 				continue;
-			}
-			
-			if( nextTree.isLastLetter == true )
-			{
-				words.add( prefix + nextTree.letter );
 			}
 			
 			die.solve( nextTree, board, prefix );
