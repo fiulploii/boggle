@@ -6,12 +6,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class Boggle 
 {
-	private List<String> 	dictionary = new ArrayList<String>();
-	private List<Die>    	dice       = new ArrayList<Die>();
-	private Tree			tree	   = new Tree();
+	private List<String> 	dictionary 	= new ArrayList<String>();
+	private List<Die>    	dice       	= new ArrayList<Die>();
+	private Tree			tree	   	= new Tree();
+	private	long			randomSeed	= 0x111111;
+	private Random			random		= new Random( randomSeed );
 	
 	Boggle()
 	{
@@ -52,7 +55,7 @@ public class Boggle
 			int id = 0;
 			for( String string : diceString )
 			{
-				dice.add( new Die( string, id++ ) );
+				dice.add( new Die( string, id++, random ) );
 			}
 		} 
 		catch (IOException e) 
@@ -63,41 +66,71 @@ public class Boggle
 	
 	public void solveRuslansBoard()
 	{
-		Board board = new Board( dice, tree );
+		Board board = new Board( dice, tree, random );
 		
 		board.readFromString( "renotvsticieraldgnephtcdb" );
 		System.out.println( board );
 		
 		board.solve();
-		board.printScore( true );
+		board.score();
+		
+		System.out.println( board.words );
+		System.out.println( board.score );
 	}
 	
-	public void tryRandomBoards( int howMany )
+	public int tryRandomBoards( Board board, int howMany, int currentDepth, int maxDepth, int currentMaxScore )
 	{
-		int maxScore = 0;
-
+		boolean generateMutations = false;
+		
+		if( currentDepth >= maxDepth )
+		{
+			return currentMaxScore;
+		}
+		
+		if( board != null )
+		{
+			generateMutations = true;
+		}
+		
+		
 		for( int idx = 0; idx < howMany; idx++ )
 		{
-			Board board = new Board( dice, tree );
-			board.print();
+			if( generateMutations )
+			{
+				board.mutate();
+			}
+			else
+			{
+				board = new Board( dice, tree, random );
+			}
 			
 			board.solve();
-			int score = board.printScore( true );
-			
-			if( score > maxScore )
-			{
-				maxScore = score;
+			board.score();
+
+			if( board.score >= currentMaxScore )
+			{	
+				System.out.println( "Score: " + board.score + ", Depth: " + currentDepth + ", Iteration: " + idx );
+				System.out.println( "---------------------------------------" );
+
+				board.print();
+				
+				System.out.println( board.words );
+				System.out.println( "---------------------------------------\n" );
+
+				currentMaxScore = tryRandomBoards( board, howMany, currentDepth + 1, maxDepth, board.score );
 			}
 		}
 		
-		System.out.println( "\nMax Score: " + maxScore );
+		return currentMaxScore;
+		//System.out.println( "\nMax score at depth " + currentDepth + ": " + maxScore );
+		//System.out.println( maxBoard );
 	}
-	
+		
 	public static void main(String[] args) 
 	{
 		Boggle boggle = new Boggle();
 		
-		boggle.solveRuslansBoard();
-		boggle.tryRandomBoards( 10 );
+		//boggle.solveRuslansBoard();
+		boggle.tryRandomBoards( null, 10, 0, 10, 0 );
 	}
 }

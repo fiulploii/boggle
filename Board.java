@@ -8,20 +8,21 @@ import java.util.Random;
 public class Board 
 {
 	private List<Die> 		dice;
-	private final long 		randomSeed 	= 0x99999;
-	private Random 			random		= new Random( randomSeed );
+	private Random 			random		= null;
 	private Tree			tree		= null;
 	private List<Integer>	scoreTable 	= Arrays.asList( 0, 0, 0, 0, 1, 2, 3, 5, 11 );
 	
 	public  HashSet<String>	words		= new HashSet<String>();
 	public  int				score		= 0;
 	
-	Board( List<Die> diceList, Tree tree )
+	Board( List<Die> diceList, Tree tree, Random random )
 	{
-		this.dice = diceList;
-		this.tree = tree;
+		this.dice 	= diceList;
+		this.tree 	= tree;
+		this.random	= random;
 		
 		shuffle();
+		roll();
 	}
 	
 	private void assignDicePositions()
@@ -32,7 +33,6 @@ public class Board
 			{
 				Die die = get( x, y );
 				
-				die.roll();
 				die.x = x;
 				die.y = y;
 			}
@@ -49,12 +49,26 @@ public class Board
 	
 	public void shuffle()
 	{
+		resetScore();
+		
 		Collections.shuffle( dice, random );
 		assignDicePositions();
 	}
 		
+	private void resetScore()
+	{
+		score = 0;
+		words.clear();
+	}
+	
 	public void roll()
 	{
+		resetScore();
+		
+		for( Die die: dice )
+		{
+			die.roll();
+		}
 	}
 	
 	public void readFromString( String string )
@@ -72,7 +86,7 @@ public class Board
 		
 		for( int idx = 0; idx < string.length(); idx++ )
 		{
-			dice.add( new Die( generateFacesFromChar( string.charAt( idx ) ), idx ) );
+			dice.add( new Die( generateFacesFromChar( string.charAt( idx ) ), idx, random ) );
 		}
 
 		assignDicePositions();
@@ -139,7 +153,7 @@ public class Board
 	
 	public void solve()
 	{
-		words.clear();
+		resetScore();
 		
 		for( int x = 0; x < 5; x++ )
 		{
@@ -187,7 +201,7 @@ public class Board
 		die.usedInWord = false;
 	}
 	
-	public int printScore( boolean toConsole )
+	public int score()
 	{
 		score = 0;
 		
@@ -197,12 +211,18 @@ public class Board
 			score += scoreTable.get( word.length() );
 		}
 		
-		if( toConsole )
-		{
-			System.out.println( words );
-			System.out.println( "Score: " + score );
-		}
-		
 		return score;
+	}
+	
+	public void printWords()
+	{
+		System.out.println( words );
+	}
+
+	public void mutate() 
+	{
+		resetScore();
+		Collections.swap( dice, random.nextInt( 25 ), random.nextInt( 25 ) );
+		assignDicePositions();
 	}
 }

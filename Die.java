@@ -9,15 +9,15 @@ public class Die
 	public 			char 				rolledFace			= '\0';
 
 	private 		String				rolledFaceString	= "";
-	private final 	long 				randomSeed			= 0x8888;
-	private 		Random 				random 				= new Random( randomSeed );
+	private 		Random 				random 				= null;
 	private			String 				faces				= null;
 	
 	
-	Die( String faces, int id )
+	Die( String faces, int id, Random random )
 	{
 		this.faces 	= faces;
 		this.id 	= id;
+		this.random = random;
 		
 		roll();
 	}
