@@ -15,6 +15,13 @@ public class Board
 	public  HashSet<String>	words		= new HashSet<String>();
 	public  int				score		= 0;
 	
+	Board( Board originalBoard )
+	{
+		this.dice = originalBoard.dice;
+		this.tree = originalBoard.tree;
+		this.random = originalBoard.random;
+	}
+	
 	Board( List<Die> diceList, Tree tree, Random random )
 	{
 		this.dice 	= diceList;
@@ -222,7 +229,15 @@ public class Board
 	public void mutate() 
 	{
 		resetScore();
-		Collections.swap( dice, random.nextInt( 25 ), random.nextInt( 25 ) );
+		
+		int swapA = random.nextInt( 25 );
+		int swapB = random.nextInt( 25 );
+		
+		Collections.swap( dice, swapA, swapB );
+		
+		dice.get( swapA ).roll();
+		dice.get( swapB ).roll();
+		
 		assignDicePositions();
 	}
 }

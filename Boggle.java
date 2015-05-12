@@ -78,7 +78,7 @@ public class Boggle
 		System.out.println( board.score );
 	}
 	
-	public int tryRandomBoards( Board board, int howMany, int currentDepth, int maxDepth, int currentMaxScore )
+	public int tryRandomBoards( Board currentMasterBoard, int howMany, int currentDepth, int maxDepth, int currentMaxScore )
 	{
 		boolean generateMutations = false;
 		
@@ -87,16 +87,18 @@ public class Boggle
 			return currentMaxScore;
 		}
 		
-		if( board != null )
+		if( currentMasterBoard != null )
 		{
 			generateMutations = true;
 		}
 		
+		Board board = null;
 		
 		for( int idx = 0; idx < howMany; idx++ )
 		{
 			if( generateMutations )
 			{
+				board = new Board( currentMasterBoard );
 				board.mutate();
 			}
 			else
@@ -107,7 +109,7 @@ public class Boggle
 			board.solve();
 			board.score();
 
-			if( board.score >= currentMaxScore )
+			if( board.score >= currentMaxScore * 0.8 || random.nextInt( 100 ) % 99 == 0 )
 			{	
 				System.out.println( "Score: " + board.score + ", Depth: " + currentDepth + ", Iteration: " + idx );
 				System.out.println( "---------------------------------------" );
@@ -117,20 +119,30 @@ public class Boggle
 				System.out.println( board.words );
 				System.out.println( "---------------------------------------\n" );
 
-				currentMaxScore = tryRandomBoards( board, howMany, currentDepth + 1, maxDepth, board.score );
+				int localScore = tryRandomBoards( board, howMany, currentDepth + 1, maxDepth, board.score );
+				
+				if( localScore > currentMaxScore )
+				{
+					currentMaxScore = localScore;
+				}
 			}
 		}
 		
 		return currentMaxScore;
-		//System.out.println( "\nMax score at depth " + currentDepth + ": " + maxScore );
-		//System.out.println( maxBoard );
 	}
 		
+	public void mutateRuslansBoard()
+	{
+		Board ruslansBoard = new Board( dice, tree, random );
+		ruslansBoard.readFromString( "renotvsticieraldgnephtcdb" );
+		tryRandomBoards( ruslansBoard, 10000, 0, 1000, 0 );
+	}
+	
 	public static void main(String[] args) 
 	{
 		Boggle boggle = new Boggle();
 		
-		//boggle.solveRuslansBoard();
-		boggle.tryRandomBoards( null, 10, 0, 10, 0 );
+		int score = boggle.tryRandomBoards( null, 300, 0, 4, 0);
+		System.out.println( "Best score is: " + score );
 	}
 }
