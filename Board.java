@@ -6,14 +6,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.sun.xml.internal.ws.util.StringUtils;
-
 public class Board 
 {
-	List<Die> dice;
-	final long randomSeed = 0x99999;
-	
-	Random random = new Random( randomSeed );
+	private List<Die> 	dice;
+	private final long 	randomSeed 	= 0x99999;
+	private Random 		random		= new Random( randomSeed );
 	
 	Board( List<Die> diceList )
 	{
@@ -33,6 +30,10 @@ public class Board
 				get( x, y ).y = y;
 			}
 		}
+	}
+	
+	public void roll()
+	{
 	}
 	
 	public void readFromString( String string )
@@ -82,6 +83,11 @@ public class Board
 		}
 		
 		return string;
+	}
+	
+	public void print()
+	{
+		System.out.println( this );
 	}
 	
 	public Die get( Integer x, Integer y )

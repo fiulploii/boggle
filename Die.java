@@ -21,6 +21,8 @@ public class Die
 	{
 		this.faces 	= faces;
 		this.id 	= id;
+		
+		roll();
 	}
 
 	public String toString()
@@ -28,18 +30,18 @@ public class Die
 		return rolledFaceString;
 	}
 	
-	char getChar()
+	public char getChar()
 	{
 		return rolledFace;
 	}
 	
-	void roll()
+	public void roll()
 	{
 		rolledFace 			= faces.charAt( random.nextInt( 6 ) );
 		rolledFaceString 	= String.valueOf( rolledFace );
 	}
 	
-	void solve( TreeNode subtree, Board board, String prefix )
+	public void solve( TreeNode subtree, Board board, String prefix )
 	{
 		if( usedInWord || subtree == null )
 		{
@@ -71,8 +73,13 @@ public class Die
 		usedInWord = false;
 	}
 	
-	List<String> getWords()
+	public List<String> getWords()
 	{
 		return wordsStartingHere;
+	}
+	
+	public void clearWords()
+	{
+		wordsStartingHere.clear();
 	}
 }

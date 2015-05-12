@@ -10,11 +10,17 @@ import java.util.List;
 
 public class Boggle 
 {
-	static List<String> dictionary = new ArrayList<String>();
-	static List<Die>    dice       = new ArrayList<Die>();
-	static Tree			tree	   = new Tree();
+	private List<String> 	dictionary = new ArrayList<String>();
+	private List<Die>    	dice       = new ArrayList<Die>();
+	private Tree			tree	   = new Tree();
 	
-	private static void readDictionary()
+	Boggle()
+	{
+		readDictionary();
+		readDice();
+	}
+	
+	private void readDictionary()
 	{
 		try 
 		{
@@ -28,6 +34,8 @@ public class Boggle
 			}
 			
 			Collections.sort( dictionary );
+			
+			tree.loadDictionary( dictionary );
 		} 
 		catch (IOException e) 
 		{
@@ -35,7 +43,7 @@ public class Boggle
 		}
 	}
 	
-	private static void readDice()
+	private void readDice()
 	{
 		List<String> diceString;
 		try 
@@ -54,7 +62,7 @@ public class Boggle
 		}
 	}
 	
-	private static void resetDiceWords()
+	private void resetDiceWords()
 	{
 		for( Die die : dice )
 		{
@@ -62,7 +70,7 @@ public class Boggle
 		}
 	}
 	
-	private static void rollOneSearch()
+	private void rollOneSearch()
 	{
 		Board board = new Board( dice );
 		int maxScore = 0;
@@ -81,59 +89,46 @@ public class Boggle
 				board.shuffle();
 			}
 		}
+	}
+
+	public void solveRuslansBoard()
+	{
+		Board board = new Board( dice );
 		
+		board.readFromString( "renotvsticieraldgnephtcdb" );
+		System.out.println( board );
 		
+		board.solve( tree.root );
+		board.printScore( true );
 	}
 	
-	public static void main(String[] args) 
+	public void tryRandomBoards( int howMany )
 	{
 		int maxScore = 0;
-		
-		readDictionary();
-		readDice();
-		
-		tree.loadDictionary( dictionary );
 
-		/*
-		int iterations = 100000;
-		int increment = iterations / 100 * 5;
-		
-		System.out.println( "Started " + iterations + " iterations at " + new Date() );
-		System.out.println( "\n0___________________100" );
-		*/
-		Board bestBoard = new Board( dice );
-		bestBoard.readFromString( "renotvsticieraldgnephtcdb" );
-		System.out.println( bestBoard );
-		bestBoard.solve( tree.root );
-		bestBoard.printScore( true );
-		
-		/*
-		for( int idx = 0; idx < iterations; idx++ )
+		for( int idx = 0; idx < howMany; idx++ )
 		{
 			resetDiceWords();
 			Board board = new Board( dice );
-			//System.out.println( board );
+			board.print();
 			
 			board.solve( tree.root );
-			int score = board.printScore( false );
+			int score = board.printScore( true );
 			
 			if( score > maxScore )
 			{
 				maxScore = score;
-				bestBoard = board;
-				
-				System.out.println( bestBoard );
-			}
-			
-			if( ( idx + 1 )% increment == 0 )
-			{
-				//System.out.print( "#");
 			}
 		}
 		
-		System.out.println( "\n\nFinished " + iterations + " iterations at " + new Date() );
-		System.out.println( "\n----------------------------------\nMax Score: " + maxScore );
+		System.out.println( "\nMax Score: " + maxScore );
+	}
+	
+	public static void main(String[] args) 
+	{
+		Boggle boggle = new Boggle();
 		
-		*/
+		boggle.solveRuslansBoard();
+		boggle.tryRandomBoards( 10 );
 	}
 }
