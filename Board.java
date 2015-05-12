@@ -28,7 +28,7 @@ public class Board
 		{
 			for( int y = 0; y < 5; y++ )
 			{
-				get( x, y ).roll( random.nextInt( 6 ) );
+				get( x, y ).roll();
 				get( x, y ).x = x;
 				get( x, y ).y = y;
 			}
@@ -59,9 +59,10 @@ public class Board
 		{
 			for( int y = 0; y < 5; y++ )
 			{
-				get( x, y ).roll( 1 );
-				get( x, y ).x = x;
-				get( x, y ).y = y;
+				Die die = get( x, y );
+				die.roll();
+				die.x = x;
+				die.y = y;
 			}
 		}
 	}
@@ -116,7 +117,7 @@ public class Board
 	{
 		for( Die die : dice )
 		{
-			die.used = false;
+			die.usedInWord = false;
 		}
 	}
 	

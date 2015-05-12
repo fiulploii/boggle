@@ -58,7 +58,7 @@ public class Boggle
 	{
 		for( Die die : dice )
 		{
-			die.words.clear();
+			die.wordsStartingHere.clear();
 		}
 	}
 	
@@ -74,7 +74,7 @@ public class Boggle
 			
 			if( score > maxScore )
 			{
-				board.rollRandomDie();
+				//board.rollRandomDie();
 			}
 			else
 			{

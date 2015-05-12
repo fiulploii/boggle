@@ -4,56 +4,54 @@ import java.util.Random;
 
 public class Die
 {
-	int id = 0;
-	String faces;
-	int rolledFace = 0;
-	int x = 0;
-	int y = 0;
-	final long randomSeed = 0x8888;
-	Random random = new Random( randomSeed );
+	public 			int 				id 					= 0;
+	public 			int 				x 					= 0;
+	public 			int 				y 					= 0;
+	public 			boolean 			usedInWord 			= false;
+	public 			ArrayList<String>	wordsStartingHere 	= new ArrayList<String>();
+	public 			char 				rolledFace			= '\0';
+
+	private 		String				rolledFaceString	= "";
+	private final 	long 				randomSeed			= 0x8888;
+	private 		Random 				random 				= new Random( randomSeed );
+	private			String 				faces				= null;
 	
-	boolean used = false;
-	ArrayList<String> words = new ArrayList<String>();
 	
-	Die( String face, Integer id )
+	Die( String faces, int id )
 	{
-		this.faces = face;
-		this.id = id;
+		this.faces 	= faces;
+		this.id 	= id;
 	}
 
 	public String toString()
 	{
-		return faces.substring( rolledFace, rolledFace + 1 );
+		return rolledFaceString;
 	}
 	
 	char getChar()
 	{
-		return faces.charAt( rolledFace );
-	}
-	
-	void roll( int face )
-	{
-		this.rolledFace = face;
+		return rolledFace;
 	}
 	
 	void roll()
 	{
-		this.rolledFace = random.nextInt( 6 ); 
+		rolledFace 			= faces.charAt( random.nextInt( 6 ) );
+		rolledFaceString 	= String.valueOf( rolledFace );
 	}
 	
 	void solve( TreeNode subtree, Board board, String prefix )
 	{
-		if( used || subtree == null )
+		if( usedInWord || subtree == null )
 		{
 			return;
 		}
 
-		used = true;
+		usedInWord = true;
 		prefix += this.toString();
 
 		if( subtree.isLastLetter == true )
 		{
-			words.add( prefix );
+			wordsStartingHere.add( prefix );
 		}
 		
 		List<Die> neighbours = board.getNeighbours( x, y );
@@ -70,11 +68,11 @@ public class Die
 			die.solve( nextTree, board, prefix );
 		}
 		
-		used = false;
+		usedInWord = false;
 	}
 	
 	List<String> getWords()
 	{
-		return words;
+		return wordsStartingHere;
 	}
 }
