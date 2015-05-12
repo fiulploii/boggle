@@ -33,21 +33,39 @@ public class Die
 		this.rolledFace = face;
 	}
 	
-	void solve( TreeNode subtree, List<Die> neighbours, String prefix )
+	void solve( TreeNode subtree, Board board, String prefix )
 	{
+		if( used )
+		{
+			return;
+		}
+		else
+		{
+			used = true;
+		}
+		
+		prefix += this.toString();
+		
+		List<Die> neighbours = board.getNeighbours( x, y );
+		
 		for( Die die : neighbours )
 		{
 			TreeNode nextTree = subtree.children.get( die.getChar() );
-			
+
 			if( nextTree == null )
 			{
-				return;
+				continue;
 			}
 			
 			if( nextTree.isLastLetter == true )
 			{
+				words.add( prefix + nextTree.letter );
 			}
+			
+			die.solve( nextTree, board, prefix );
 		}
+		
+		used = false;
 	}
 	
 	List<String> getWords()

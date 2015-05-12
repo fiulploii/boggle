@@ -11,4 +11,9 @@ public class Tree
 			root.addWord( word );
 		}
 	}
+	
+	public void print()
+	{
+		root.print( "" );
+	}
 }

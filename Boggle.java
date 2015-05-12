@@ -59,10 +59,12 @@ public class Boggle
 		readDice();
 		
 		tree.loadDictionary( dictionary );
+		tree.print();
 		
 		Board board = new Board( dice );
 		System.out.println( board );
 		
 		board.solve( tree.root );
+		board.printScore();
 	}
 }

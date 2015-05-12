@@ -1,8 +1,11 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Board 
 {
@@ -11,7 +14,7 @@ public class Board
 	Board( List<Die> diceList )
 	{
 		dice = diceList;
-		final long randomSeed = 0x987123;
+		final long randomSeed = 0x111123;
 		
 		Random random = new Random( randomSeed );
 		
@@ -53,15 +56,21 @@ public class Board
 	public List<Die> getNeighbours( Integer x, Integer y)
 	{
 		List<Die> neighbours = new ArrayList<Die>();
-		Integer myOffset = x * 5 + y;
 		
-		List<Integer> deltaList = Arrays.asList( -6, -5, -4, -1, +1, +4, +5, +6 );
+		List<Integer> deltaXList = Arrays.asList( -1, -1, -1, 0, +1, +1, +1, 0 );
+		List<Integer> deltaYList = Arrays.asList( -1, 0, +1, +1, +1, 0, -1, -1 );
 		
-		for( Integer delta : deltaList )
+		for( int idx = 0; idx < deltaXList.size(); idx++ )
 		{
-			if( myOffset - delta >= 0 )
+			int deltaX = deltaXList.get( idx );
+			int deltaY = deltaYList.get( idx );
+			
+			int neighbourX = x + deltaX;
+			int neighbourY = y + deltaY;
+			
+			if( neighbourX < 5 && neighbourX >=0 && neighbourY < 5 && neighbourY >=0 )
 			{
-				neighbours.add( dice.get( myOffset - delta ) );
+				neighbours.add( get( neighbourX, neighbourY ) );
 			}
 		}
 		
@@ -83,24 +92,38 @@ public class Board
 			for( int y = 0; y < 5; y++ )
 			{
 				resetUsedFlag();
-				get( x, y ).solve( tree, getNeighbours( x, y ), "" );
+				Die die = get( x, y );
+				die.solve( tree.children.get( die.getChar() ), this, "" );
 			}
 		}
 	}
 	
 	public void printScore()
 	{
+		int score = 0;
+		List<String> allWords = new ArrayList<String>();
+		List<Integer> scoreTable = Arrays.asList( 0, 0, 0, 0, 1, 2, 3, 5, 11 );
+		
 		for( int x = 0; x < 5; x++ )
 		{
 			for( int y = 0; y < 5; y++ )
 			{
 				List<String> words = get( x, y ).getWords();
-				
-				for( String word : words )
-				{
-					System.out.println( x + "," + y + ": " + word + "\n" );
-				}
+				allWords.addAll( words );
 			}
 		}
+		
+		Collections.sort( allWords );
+		Set<String> wordSet = new TreeSet<String>( allWords );
+		
+		for( String word : wordSet )
+		{
+			word.replaceAll( "q", "qu" );
+			score += scoreTable.get( word.length() );
+		}
+		
+		System.out.println( wordSet );
+		
+		System.out.println( "Score: " + score );
 	}
 }

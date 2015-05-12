@@ -35,4 +35,28 @@ public class TreeNode
 		letterNode.count++;
 		letterNode.addWord( word.substring( 1 ) );
 	}
+	
+	public void print( String prefix )
+	{
+		String horizontal = "";
+		
+		if( letter != '\0' )
+		{
+			System.out.println( prefix + letter + "          " + count + " " + isLastLetter );
+			
+			if( prefix.length() == 0 )
+			{
+				horizontal = "|-";
+			}
+			else
+			{
+				horizontal = "--";
+			}
+		}
+		
+		for( TreeNode node : children.values() )
+		{
+			node.print( prefix + horizontal );
+		}
+	}
 }
