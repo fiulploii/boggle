@@ -61,14 +61,6 @@ public class Boggle
 		}
 	}
 	
-	private void resetDiceWords()
-	{
-		for( Die die : dice )
-		{
-			die.wordsStartingHere.clear();
-		}
-	}
-	
 	public void solveRuslansBoard()
 	{
 		Board board = new Board( dice, tree );
@@ -76,7 +68,7 @@ public class Boggle
 		board.readFromString( "renotvsticieraldgnephtcdb" );
 		System.out.println( board );
 		
-		board.solve( tree.root );
+		board.solve();
 		board.printScore( true );
 	}
 	
@@ -86,12 +78,11 @@ public class Boggle
 
 		for( int idx = 0; idx < howMany; idx++ )
 		{
-			resetDiceWords();
 			Board board = new Board( dice, tree );
 			board.print();
 			
-			board.solve2();
-			int score = board.printScore2( true );
+			board.solve();
+			int score = board.printScore( true );
 			
 			if( score > maxScore )
 			{

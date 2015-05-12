@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class Die
@@ -8,7 +6,6 @@ public class Die
 	public 			int 				x 					= 0;
 	public 			int 				y 					= 0;
 	public 			boolean 			usedInWord 			= false;
-	public 			ArrayList<String>	wordsStartingHere 	= new ArrayList<String>();
 	public 			char 				rolledFace			= '\0';
 
 	private 		String				rolledFaceString	= "";
@@ -39,47 +36,5 @@ public class Die
 	{
 		rolledFace 			= faces.charAt( random.nextInt( 6 ) );
 		rolledFaceString 	= String.valueOf( rolledFace );
-	}
-	
-	public void solve( TreeNode subtree, Board board, String prefix )
-	{
-		if( usedInWord || subtree == null )
-		{
-			return;
-		}
-
-		usedInWord = true;
-		prefix += this.toString();
-
-		if( subtree.isLastLetterOfWord == true )
-		{
-			wordsStartingHere.add( prefix );
-		}
-		
-		List<Die> neighbours = board.getNeighbours( x, y );
-		
-		for( Die die : neighbours )
-		{
-			TreeNode nextTree = subtree.children.get( die.getChar() );
-
-			if( nextTree == null )
-			{
-				continue;
-			}
-			
-			die.solve( nextTree, board, prefix );
-		}
-		
-		usedInWord = false;
-	}
-	
-	public List<String> getWords()
-	{
-		return wordsStartingHere;
-	}
-	
-	public void clearWords()
-	{
-		wordsStartingHere.clear();
 	}
 }

@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class Board 
 {
@@ -139,23 +137,10 @@ public class Board
 		}
 	}
 	
-	public void solve( TreeNode tree )
+	public void solve()
 	{
-		for( int x = 0; x < 5; x++ )
-		{
-			for( int y = 0; y < 5; y++ )
-			{
-				resetUsedFlag();
-				Die die = get( x, y );
-				die.solve( tree.children.get( die.getChar() ), this, "" );
-			}
-		}
+		words.clear();
 		
-		resetUsedFlag();
-	}
-	
-	public void solve2()
-	{
 		for( int x = 0; x < 5; x++ )
 		{
 			for( int y = 0; y < 5; y++ )
@@ -202,7 +187,7 @@ public class Board
 		die.usedInWord = false;
 	}
 	
-	public int printScore2( boolean toConsole )
+	public int printScore( boolean toConsole )
 	{
 		score = 0;
 		
@@ -215,38 +200,6 @@ public class Board
 		if( toConsole )
 		{
 			System.out.println( words );
-			System.out.println( "Score: " + score );
-		}
-		
-		return score;
-	}
-	
-	public int printScore( boolean toConsole )
-	{
-		score = 0;
-		List<String> allWords = new ArrayList<String>();
-		
-		for( int x = 0; x < 5; x++ )
-		{
-			for( int y = 0; y < 5; y++ )
-			{
-				List<String> words = get( x, y ).getWords();
-				allWords.addAll( words );
-			}
-		}
-		
-		Collections.sort( allWords );
-		Set<String> wordSet = new TreeSet<String>( allWords );
-		
-		for( String word : wordSet )
-		{
-			word.replaceAll( "q", "qu" );
-			score += scoreTable.get( word.length() );
-		}
-		
-		if( toConsole )
-		{
-			System.out.println( wordSet );
 			System.out.println( "Score: " + score );
 		}
 		
