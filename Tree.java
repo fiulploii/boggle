@@ -2,7 +2,7 @@ import java.util.List;
 
 public class Tree 
 {
-	TreeNode root = new TreeNode( '\0' );
+	public TreeNode root = new TreeNode( '\0' );
 	
 	public void loadDictionary( List<String> dictionary )
 	{

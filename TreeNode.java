@@ -2,11 +2,11 @@ import java.util.HashMap;
 
 public class TreeNode 
 {
-	public char letter = 0;
-	public Integer count = 0;
-	public boolean isLastLetter = false;
+	public char 	letter 				= '\0';
+	public int 		count 				= 0;
+	public boolean 	isLastLetterOfWord 	= false;
 	
-	HashMap<Character,TreeNode> children = new HashMap<Character,TreeNode>();
+	public HashMap<Character,TreeNode> children = new HashMap<Character,TreeNode>();
 
 	public TreeNode( char letter )
 	{
@@ -17,15 +17,13 @@ public class TreeNode
 	{
 		if( word.length() == 0 )
 		{
-			isLastLetter = true;
+			isLastLetterOfWord = true;
 			return;
 		}
 
-		Character letter = Character.valueOf( word.charAt( 0 ) );
-		TreeNode letterNode = null;
+		char 		letter 		= word.charAt( 0 );
+		TreeNode 	letterNode 	= children.get( letter );
 
-		letterNode = children.get( letter ) ;
-		
 		if( letterNode == null )
 		{
 			letterNode = new TreeNode( letter );
@@ -42,7 +40,7 @@ public class TreeNode
 		
 		if( letter != '\0' )
 		{
-			System.out.println( prefix + letter + "          " + count + " " + isLastLetter );
+			System.out.println( prefix + letter + "              " + count + " " + isLastLetterOfWord );
 			
 			if( prefix.length() == 0 )
 			{

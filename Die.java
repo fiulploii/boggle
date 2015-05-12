@@ -51,7 +51,7 @@ public class Die
 		usedInWord = true;
 		prefix += this.toString();
 
-		if( subtree.isLastLetter == true )
+		if( subtree.isLastLetterOfWord == true )
 		{
 			wordsStartingHere.add( prefix );
 		}

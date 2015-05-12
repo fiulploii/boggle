@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -8,30 +9,52 @@ import java.util.TreeSet;
 
 public class Board 
 {
-	private List<Die> 	dice;
-	private final long 	randomSeed 	= 0x99999;
-	private Random 		random		= new Random( randomSeed );
+	private List<Die> 		dice;
+	private final long 		randomSeed 	= 0x99999;
+	private Random 			random		= new Random( randomSeed );
+	private Tree			tree		= null;
+	private List<Integer>	scoreTable 	= Arrays.asList( 0, 0, 0, 0, 1, 2, 3, 5, 11 );
 	
-	Board( List<Die> diceList )
+	public  HashSet<String>	words		= new HashSet<String>();
+	public  int				score		= 0;
+	
+	Board( List<Die> diceList, Tree tree )
 	{
-		dice = diceList;
+		this.dice = diceList;
+		this.tree = tree;
+		
 		shuffle();
+	}
+	
+	private void assignDicePositions()
+	{
+		for( int x = 0; x < 5; x++ )
+		{
+			for( int y = 0; y < 5; y++ )
+			{
+				Die die = get( x, y );
+				
+				die.roll();
+				die.x = x;
+				die.y = y;
+			}
+		}
+	}
+	
+	private String generateFacesFromChar( char c )
+	{
+		char[] temp = new char[6];
+		Arrays.fill( temp, c );
+		
+		return new String( temp );
 	}
 	
 	public void shuffle()
 	{
 		Collections.shuffle( dice, random );
-		for( int x = 0; x < 5; x++ )
-		{
-			for( int y = 0; y < 5; y++ )
-			{
-				get( x, y ).roll();
-				get( x, y ).x = x;
-				get( x, y ).y = y;
-			}
-		}
+		assignDicePositions();
 	}
-	
+		
 	public void roll()
 	{
 	}
@@ -48,24 +71,13 @@ public class Board
 		}
 		
 		dice.clear();
-		char[] temp = new char[6];
+		
 		for( int idx = 0; idx < string.length(); idx++ )
 		{
-			Arrays.fill( temp, string.charAt( idx ) );
-			String face = new String( temp );
-			dice.add( new Die( face, idx ) );
+			dice.add( new Die( generateFacesFromChar( string.charAt( idx ) ), idx ) );
 		}
-		
-		for( int x = 0; x < 5; x++ )
-		{
-			for( int y = 0; y < 5; y++ )
-			{
-				Die die = get( x, y );
-				die.roll();
-				die.x = x;
-				die.y = y;
-			}
-		}
+
+		assignDicePositions();
 	}
 
 	public String toString()
@@ -95,7 +107,7 @@ public class Board
 		return dice.get( x * 5 + y );
 	}
 	
-	public List<Die> getNeighbours( Integer x, Integer y)
+	public List<Die> getNeighbours( int x, int y)
 	{
 		List<Die> neighbours = new ArrayList<Die>();
 		
@@ -142,11 +154,77 @@ public class Board
 		resetUsedFlag();
 	}
 	
+	public void solve2()
+	{
+		for( int x = 0; x < 5; x++ )
+		{
+			for( int y = 0; y < 5; y++ )
+			{
+				Die die = get( x, y );
+				
+				resetUsedFlag();
+				innerSolve( die, tree.root.children.get( die.getChar() ), "" );
+			}
+		}
+		
+		resetUsedFlag();
+	}
+	
+	private void innerSolve( Die die, TreeNode subtree, String prefix )
+	{
+		if( die.usedInWord || subtree == null )
+		{
+			return;
+		}
+
+		die.usedInWord = true;
+		prefix += die.toString();
+
+		if( subtree.isLastLetterOfWord == true )
+		{
+			words.add( prefix );
+		}
+		
+		List<Die> neighbours = getNeighbours( die.x, die.y );
+		
+		for( Die neighbour : neighbours )
+		{
+			TreeNode nextTree = subtree.children.get( neighbour.getChar() );
+
+			if( nextTree == null )
+			{
+				continue;
+			}
+			
+			innerSolve( neighbour, nextTree, prefix );
+		}
+		
+		die.usedInWord = false;
+	}
+	
+	public int printScore2( boolean toConsole )
+	{
+		score = 0;
+		
+		for( String word : words )
+		{
+			word.replaceAll( "q", "qu" );
+			score += scoreTable.get( word.length() );
+		}
+		
+		if( toConsole )
+		{
+			System.out.println( words );
+			System.out.println( "Score: " + score );
+		}
+		
+		return score;
+	}
+	
 	public int printScore( boolean toConsole )
 	{
-		int score = 0;
+		score = 0;
 		List<String> allWords = new ArrayList<String>();
-		List<Integer> scoreTable = Arrays.asList( 0, 0, 0, 0, 1, 2, 3, 5, 11 );
 		
 		for( int x = 0; x < 5; x++ )
 		{

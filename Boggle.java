@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.util.Date;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -70,30 +69,9 @@ public class Boggle
 		}
 	}
 	
-	private void rollOneSearch()
-	{
-		Board board = new Board( dice );
-		int maxScore = 0;
-		
-		for( int idx = 0; idx < 10000; idx++ )
-		{
-			board.solve( tree.root );
-			int score = board.printScore( false );
-			
-			if( score > maxScore )
-			{
-				//board.rollRandomDie();
-			}
-			else
-			{
-				board.shuffle();
-			}
-		}
-	}
-
 	public void solveRuslansBoard()
 	{
-		Board board = new Board( dice );
+		Board board = new Board( dice, tree );
 		
 		board.readFromString( "renotvsticieraldgnephtcdb" );
 		System.out.println( board );
@@ -109,11 +87,11 @@ public class Boggle
 		for( int idx = 0; idx < howMany; idx++ )
 		{
 			resetDiceWords();
-			Board board = new Board( dice );
+			Board board = new Board( dice, tree );
 			board.print();
 			
-			board.solve( tree.root );
-			int score = board.printScore( true );
+			board.solve2();
+			int score = board.printScore2( true );
 			
 			if( score > maxScore )
 			{
