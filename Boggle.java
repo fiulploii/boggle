@@ -62,6 +62,29 @@ public class Boggle
 		}
 	}
 	
+	private static void rollOneSearch()
+	{
+		Board board = new Board( dice );
+		int maxScore = 0;
+		
+		for( int idx = 0; idx < 10000; idx++ )
+		{
+			board.solve( tree.root );
+			int score = board.printScore( false );
+			
+			if( score > maxScore )
+			{
+				board.rollRandomDie();
+			}
+			else
+			{
+				board.shuffle();
+			}
+		}
+		
+		
+	}
+	
 	public static void main(String[] args) 
 	{
 		int maxScore = 0;

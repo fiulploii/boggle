@@ -11,16 +11,19 @@ import com.sun.xml.internal.ws.util.StringUtils;
 public class Board 
 {
 	List<Die> dice;
+	final long randomSeed = 0x99999;
+	
+	Random random = new Random( randomSeed );
 	
 	Board( List<Die> diceList )
 	{
 		dice = diceList;
-		final long randomSeed = 0x99999;
-		
-		Random random = new Random( randomSeed );
-		
+		shuffle();
+	}
+	
+	public void shuffle()
+	{
 		Collections.shuffle( dice, random );
-		
 		for( int x = 0; x < 5; x++ )
 		{
 			for( int y = 0; y < 5; y++ )

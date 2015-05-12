@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Die
 {
@@ -8,6 +9,8 @@ public class Die
 	int rolledFace = 0;
 	int x = 0;
 	int y = 0;
+	final long randomSeed = 0x8888;
+	Random random = new Random( randomSeed );
 	
 	boolean used = false;
 	ArrayList<String> words = new ArrayList<String>();
@@ -31,6 +34,11 @@ public class Die
 	void roll( int face )
 	{
 		this.rolledFace = face;
+	}
+	
+	void roll()
+	{
+		this.rolledFace = random.nextInt( 6 ); 
 	}
 	
 	void solve( TreeNode subtree, Board board, String prefix )
