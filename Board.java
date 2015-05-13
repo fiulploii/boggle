@@ -10,7 +10,8 @@ public class Board
 	private List<Die> 		dice;
 	private Random 			random		= null;
 	private Tree			tree		= null;
-	private List<Integer>	scoreTable 	= Arrays.asList( 0, 0, 0, 0, 1, 2, 3, 5, 11 );
+	private List<Integer>           scoreTable 	= Arrays.asList( 0, 0, 0, 0, 1, 2, 3, 5, 11 );
+        private List<List<Die>>         neighbours      = new ArrayList<List<Die>>();
 	
 	public  HashSet<String>	words		= new HashSet<String>();
 	public  int				score		= 0;
@@ -20,6 +21,8 @@ public class Board
 		this.dice = originalBoard.dice;
 		this.tree = originalBoard.tree;
 		this.random = originalBoard.random;
+                
+                createNeighboursCache();
 	}
 	
 	Board( List<Die> diceList, Tree tree, Random random )
@@ -28,22 +31,38 @@ public class Board
 		this.tree 	= tree;
 		this.random	= random;
 		
+                createNeighboursCache();
 		shuffle();
 		roll();
 	}
 	
-	private void assignDicePositions()
+        private void createNeighboursCache()
+        {
+                for( int idx = 0; idx < 25; idx++ )
+                {
+                    neighbours.add( new ArrayList<Die>() );
+                }            
+        }
+        
+        private void assignDicePositions()
 	{
-		for( int x = 0; x < 5; x++ )
-		{
-			for( int y = 0; y < 5; y++ )
-			{
-				Die die = get( x, y );
-				
-				die.x = x;
-				die.y = y;
-			}
-		}
+            for( int idx = 0; idx < 25; idx++ )
+            {
+                neighbours.get( idx ).clear();
+            }
+		
+            for( int x = 0; x < 5; x++ )
+            {
+                    for( int y = 0; y < 5; y++ )
+                    {
+                            Die die = get( x, y );
+
+                            die.x = x;
+                            die.y = y;
+
+                            neighbours.get( x * 5 + y ).addAll( getNeighboursSlow( x, y) );
+                    }
+            }
 	}
 	
 	private String generateFacesFromChar( char c )
@@ -126,7 +145,12 @@ public class Board
 		return dice.get( x * 5 + y );
 	}
 	
-	public List<Die> getNeighbours( int x, int y)
+        public List<Die> getNeighboursCached( int x, int y )
+        {
+            return neighbours.get( x * 5 + y );
+        }
+        
+	public List<Die> getNeighboursSlow( int x, int y)
 	{
 		List<Die> neighbours = new ArrayList<Die>();
 		
@@ -191,7 +215,7 @@ public class Board
 			words.add( prefix );
 		}
 		
-		List<Die> neighbours = getNeighbours( die.x, die.y );
+		List<Die> neighbours = getNeighboursCached( die.x, die.y );
 		
 		for( Die neighbour : neighbours )
 		{

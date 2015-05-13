@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -82,7 +83,7 @@ public class Boggle
 	{
 		boolean generateMutations = false;
 		
-		if( currentDepth >= maxDepth )
+		if( currentDepth > maxDepth )
 		{
 			return currentMaxScore;
 		}
@@ -111,13 +112,13 @@ public class Boggle
 
 			if( board.score >= currentMaxScore * 0.8 || random.nextInt( 100 ) % 99 == 0 )
 			{	
-				System.out.println( "Score: " + board.score + ", Depth: " + currentDepth + ", Iteration: " + idx );
-				System.out.println( "---------------------------------------" );
+				//System.out.println( "Score: " + board.score + ", Depth: " + currentDepth + ", Iteration: " + idx );
+				//System.out.println( "---------------------------------------" );
 
-				board.print();
+				//board.print();
 				
-				System.out.println( board.words );
-				System.out.println( "---------------------------------------\n" );
+				//System.out.println( board.words );
+				//System.out.println( "---------------------------------------\n" );
 
 				int localScore = tryRandomBoards( board, howMany, currentDepth + 1, maxDepth, board.score );
 				
@@ -141,8 +142,13 @@ public class Boggle
 	public static void main(String[] args) 
 	{
 		Boggle boggle = new Boggle();
-		
-		int score = boggle.tryRandomBoards( null, 300, 0, 4, 0);
-		System.out.println( "Best score is: " + score );
+                
+                Date start = new Date();
+		int score = boggle.tryRandomBoards( null, 100000, 0, 0, 0);
+                Date end = new Date();
+                
+                System.out.println( "Processing started " + start );
+                System.out.println( "Processing ended " + end );
+                System.out.println( "Best score is: " + score );
 	}
 }
