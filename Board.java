@@ -1,13 +1,20 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class Board 
 {
 	private List<Die> 		dice;
+        private List<Die>               availableDice;
 	private Random 			random		= null;
 	private Tree			tree		= null;
 	private List<Integer>           scoreTable 	= Arrays.asList( 0, 0, 0, 0, 1, 2, 3, 5, 11 );
@@ -19,6 +26,7 @@ public class Board
 	Board( Board originalBoard )
 	{
 		this.dice = originalBoard.dice;
+                this.availableDice = this.dice;
 		this.tree = originalBoard.tree;
 		this.random = originalBoard.random;
                 
@@ -28,6 +36,7 @@ public class Board
 	Board( List<Die> diceList, Tree tree, Random random )
 	{
 		this.dice 	= diceList;
+                this.availableDice = this.dice;
 		this.tree 	= tree;
 		this.random	= random;
 		
@@ -46,6 +55,8 @@ public class Board
         
         private void assignDicePositions()
 	{
+            resetScore();
+            
             for( int idx = 0; idx < 25; idx++ )
             {
                 neighbours.get( idx ).clear();
@@ -114,6 +125,8 @@ public class Board
 		{
 			dice.add( new Die( generateFacesFromChar( string.charAt( idx ) ), idx, random ) );
 		}
+                
+                availableDice = dice;
 
 		assignDicePositions();
 	}
@@ -250,7 +263,19 @@ public class Board
 		System.out.println( words );
 	}
 
-	public void mutate() 
+        public void swap2RandomDice()
+        {
+		resetScore();
+		
+		int swapA = random.nextInt( 25 );
+		int swapB = random.nextInt( 25 );
+		
+		Collections.swap( dice, swapA, swapB );
+		
+		assignDicePositions();
+        }
+        
+	public void swapAndRoll2RandomDice() 
 	{
 		resetScore();
 		
@@ -264,4 +289,86 @@ public class Board
 		
 		assignDicePositions();
 	}
+        
+        private void placeDie( Die die, int x, int y )
+        {
+            dice.add( die );
+            die.x = x;
+            die.y = y;
+        }
+        
+        public void centerWeightedProbabilityBoard()
+        {
+            List<Integer> ring1X = Arrays.asList( 1, 1, 1, 2, 3, 3, 3, 2 );
+            List<Integer> ring1Y = Arrays.asList( 1, 2, 3, 3, 3, 2, 1, 1 );
+            
+            List<Integer> ring2X = Arrays.asList( 0, 0, 0, 0, 0, 1, 2, 3, 4, 4, 4, 4, 4, 3, 2, 1 );
+            List<Integer> ring2Y = Arrays.asList( 0, 1, 2, 3, 4, 4, 4, 4, 4, 3, 2, 1, 0, 0, 0, 0 );
+            
+            List<Die> diceStillRemaining = availableDice;
+            
+            dice.clear();
+            
+            // place center piece
+            Die centerDie = diceStillRemaining.get( random.nextInt( diceStillRemaining.size() ) );
+            diceStillRemaining.remove( centerDie );
+            
+            placeDie( centerDie, 2, 2 );
+            
+            // place ring 1
+            for( int idx = 0; idx < ring1X.size(); idx++ )
+            {
+                int x = ring1X.get( idx );
+                int y = ring1Y.get( idx );
+                
+                
+            }
+        }
+        
+        private int[] getNextBestDice( int baseDie, int howMany, int[][] dieCountMatrix )
+        {
+            int[] returnValue = new int[ howMany ];
+            Map<Integer, Integer> nextDiceMap = new HashMap<Integer, Integer>();
+            
+            for( int idx = 0; idx < 25; idx++ )
+            {
+                if( idx != baseDie )
+                {
+                    nextDiceMap.put( idx, dieCountMatrix[baseDie][idx] );
+                }
+            }
+            
+            Map<Integer,Integer> sortedNextDiceMap = sortByValue( nextDiceMap );
+            
+            int count = 0;
+            for( Integer dieId : sortedNextDiceMap.keySet() )
+            {
+                returnValue[ count ] = dieId;
+                count++;
+                
+                if( count >= howMany )
+                    break;
+            }
+            
+            return returnValue;
+        }
+        
+    public static Map sortByValue(Map unsortMap) 
+    {
+        List list = new LinkedList(unsortMap.entrySet());
+
+        Collections.sort(list, new Comparator() {
+            public int compare(Object o1, Object o2) {
+                return ((Comparable) ((Map.Entry) (o1)).getValue())
+                        .compareTo(((Map.Entry) (o2)).getValue());
+            }
+        });
+
+        Map sortedMap = new LinkedHashMap();
+        for (Iterator it = list.iterator(); it.hasNext();) {
+            Map.Entry entry = (Map.Entry) it.next();
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedMap;
+    }
 }

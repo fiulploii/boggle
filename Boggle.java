@@ -16,13 +16,70 @@ public class Boggle
 	private Tree			tree	   	= new Tree();
 	private	long			randomSeed	= 0x111111;
 	private Random			random		= new Random( randomSeed );
-	
+        private String          maxBoard        = "";
+        private int             maxScore        = 0;
+        private int             boardsExplored  = 0;
+        private int[][] dieCountMatrix = new int[25][25];
+        private int[][] charCountMatrix = new int[255][255];	
+        
 	Boggle()
 	{
-		readDictionary();
-		readDice();
+            readDice();
+            readDictionary();
+            computeDieProbabilityMatrix();
 	}
 	
+        public void newRandomWithSeed( long seed )
+        {
+            this.randomSeed = seed;
+            random = new Random( randomSeed );
+        }
+        
+        private void computeDieProbabilityMatrix()
+        {
+            for( int x = 0; x < 25; x++ )
+            {
+                for( int y = 0; y < 25; y++ )
+                {
+                    dieCountMatrix[x][y] = 0;
+                }
+            }
+            
+            for( int x = 0; x < 255; x++ )
+            {
+                for( int y = 0; y < 255; y++ )
+                {
+                    charCountMatrix[x][y] = 0;
+                }
+            }
+
+            for( String word : dictionary )
+            {
+                for( int idx = 0; idx < word.length() - 1; idx++ )
+                {
+                    charCountMatrix[ word.charAt( idx ) ][ word.charAt( idx + 1 ) ]++;
+                }
+            }
+            
+            for( char firstChar = 0; firstChar < 255; firstChar++ )
+            {
+                for( char nextChar = 0; nextChar < 255; nextChar++ )
+                {
+                    List<Die> firstDice = getDiceContainingLetter( firstChar );
+                    List<Die> nextDice = getDiceContainingLetter( nextChar );
+
+                    for( Die firstDie : firstDice )
+                    {
+                        for( Die nextDie : nextDice )
+                        {
+                            if( firstDie.id != nextDie.id )
+                                dieCountMatrix[ firstDie.id ][ nextDie.id ] += charCountMatrix[ firstChar ][ nextChar ];
+                        }
+                    }
+                }
+            }
+        }
+        
 	private void readDictionary()
 	{
 		try 
@@ -37,7 +94,7 @@ public class Boggle
 			}
 			
 			Collections.sort( dictionary );
-			
+
 			tree.loadDictionary( dictionary );
 		} 
 		catch (IOException e) 
@@ -65,6 +122,11 @@ public class Boggle
 		}
 	}
 	
+        public void centerWeightedProbabilityBoard()
+        {
+            Board board = new Board( dice, tree, random );
+        }
+        
 	public void solveRuslansBoard()
 	{
 		Board board = new Board( dice, tree, random );
@@ -79,13 +141,13 @@ public class Boggle
 		System.out.println( board.score );
 	}
 	
-	public int tryRandomBoards( Board currentMasterBoard, int howMany, int currentDepth, int maxDepth, int currentMaxScore )
+	public void tryRandomBoards( Board currentMasterBoard, int howMany, int currentDepth, int maxDepth )
 	{
 		boolean generateMutations = false;
-		
+                
 		if( currentDepth > maxDepth )
 		{
-			return currentMaxScore;
+			return;
 		}
 		
 		if( currentMasterBoard != null )
@@ -100,7 +162,7 @@ public class Boggle
 			if( generateMutations )
 			{
 				board = new Board( currentMasterBoard );
-				board.mutate();
+				board.swapAndRoll2RandomDice();
 			}
 			else
 			{
@@ -109,46 +171,63 @@ public class Boggle
 			
 			board.solve();
 			board.score();
+                        boardsExplored++;
+                        
+                        if( boardsExplored % 600000 == 0 ) // about every 5 minutes on my machine
+                        {
+                            System.out.println( new Date().toString() + "\nAfter " + boardsExplored + " boards the max score is " + maxScore + " on board:\n" + maxBoard.toString() + "\n--------------------------------------------" );
+                        }
 
-			if( board.score >= currentMaxScore * 0.8 || random.nextInt( 100 ) % 99 == 0 )
-			{	
-				//System.out.println( "Score: " + board.score + ", Depth: " + currentDepth + ", Iteration: " + idx );
-				//System.out.println( "---------------------------------------" );
-
-				//board.print();
-				
-				//System.out.println( board.words );
-				//System.out.println( "---------------------------------------\n" );
-
-				int localScore = tryRandomBoards( board, howMany, currentDepth + 1, maxDepth, board.score );
-				
-				if( localScore > currentMaxScore )
-				{
-					currentMaxScore = localScore;
-				}
+			if( board.score >= maxScore )
+			{
+                                maxScore = board.score;
+                                maxBoard = board.toString();
+                                
+				tryRandomBoards( board, howMany, currentDepth + 1, maxDepth );
 			}
 		}
-		
-		return currentMaxScore;
 	}
 		
 	public void mutateRuslansBoard()
 	{
 		Board ruslansBoard = new Board( dice, tree, random );
 		ruslansBoard.readFromString( "renotvsticieraldgnephtcdb" );
-		tryRandomBoards( ruslansBoard, 10000, 0, 1000, 0 );
+		tryRandomBoards( ruslansBoard, 10000, 0, 1000 );
 	}
 	
 	public static void main(String[] args) 
 	{
+            
 		Boggle boggle = new Boggle();
+
+                if( args.length > 0 )
+                {
+                    System.out.println( "Using random seed " + args[0] );
+                    boggle.newRandomWithSeed( Long.parseLong( args[0] ) );
+                }
                 
                 Date start = new Date();
-		int score = boggle.tryRandomBoards( null, 100000, 0, 0, 0);
+		boggle.tryRandomBoards( null, 1000000, 0, 10 );
                 Date end = new Date();
                 
                 System.out.println( "Processing started " + start );
                 System.out.println( "Processing ended " + end );
-                System.out.println( "Best score is: " + score );
+                System.out.println( "Best score out of " + boggle.boardsExplored + " is: " + boggle.maxScore );
+                System.out.println( "Best board is:\n" + boggle.maxBoard );
 	}
+
+    private List<Die> getDiceContainingLetter( char letter ) 
+    {
+        List<Die> returnList = new ArrayList<Die>();
+        
+        for( Die die : dice )
+        {
+            if( die.toString().indexOf( letter ) >-1 )
+            {
+                returnList.add( die );
+            }
+        }
+        
+        return returnList;
+    }
 }
