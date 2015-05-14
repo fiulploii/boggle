@@ -14,7 +14,7 @@ import java.util.Random;
 public class Board 
 {
 	private List<Die> 		dice;
-        private List<Die>               availableDice;
+        private List<Die>               availableDice   = new ArrayList<Die>();
 	private Random 			random		= null;
 	private Tree			tree		= null;
 	private List<Integer>           scoreTable 	= Arrays.asList( 0, 0, 0, 0, 1, 2, 3, 5, 11 );
@@ -26,7 +26,9 @@ public class Board
 	Board( Board originalBoard )
 	{
 		this.dice = originalBoard.dice;
-                this.availableDice = this.dice;
+                for( int idx = 0; idx < this.dice.size(); idx++ )
+                    this.availableDice.add( this.dice.get( idx ) );
+                
 		this.tree = originalBoard.tree;
 		this.random = originalBoard.random;
                 
@@ -36,7 +38,9 @@ public class Board
 	Board( List<Die> diceList, Tree tree, Random random )
 	{
 		this.dice 	= diceList;
-                this.availableDice = this.dice;
+                for( int idx = 0; idx < this.dice.size(); idx++ )
+                    this.availableDice.add( this.dice.get( idx ) );
+                
 		this.tree 	= tree;
 		this.random	= random;
 		
@@ -290,14 +294,16 @@ public class Board
 		assignDicePositions();
 	}
         
-        private void placeDie( Die die, int x, int y )
+        private void placeDie( Die die, List<Die> fromList, int x, int y )
         {
             dice.add( die );
             die.x = x;
             die.y = y;
+            
+            fromList.remove( die );
         }
         
-        public void centerWeightedProbabilityBoard()
+        public void centerWeightedProbabilityBoard( int[][] dieCountMatrix )
         {
             List<Integer> ring1X = Arrays.asList( 1, 1, 1, 2, 3, 3, 3, 2 );
             List<Integer> ring1Y = Arrays.asList( 1, 2, 3, 3, 3, 2, 1, 1 );
@@ -305,15 +311,21 @@ public class Board
             List<Integer> ring2X = Arrays.asList( 0, 0, 0, 0, 0, 1, 2, 3, 4, 4, 4, 4, 4, 3, 2, 1 );
             List<Integer> ring2Y = Arrays.asList( 0, 1, 2, 3, 4, 4, 4, 4, 4, 3, 2, 1, 0, 0, 0, 0 );
             
-            List<Die> diceStillRemaining = availableDice;
+            List<Die> diceStillRemaining = new ArrayList<Die>();
+            
+            for( int idx = 0; idx < availableDice.size(); idx++ )
+                    diceStillRemaining.add( availableDice.get( idx ) );
             
             dice.clear();
             
             // place center piece
             Die centerDie = diceStillRemaining.get( random.nextInt( diceStillRemaining.size() ) );
-            diceStillRemaining.remove( centerDie );
             
-            placeDie( centerDie, 2, 2 );
+            placeDie( centerDie, diceStillRemaining, 2, 2 );
+            
+            // get next dice
+            List<Die> ring1Dice = getNextBestDice( centerDie.id, 8, dieCountMatrix );
+            Collections.shuffle( ring1Dice, random );
             
             // place ring 1
             for( int idx = 0; idx < ring1X.size(); idx++ )
@@ -321,13 +333,24 @@ public class Board
                 int x = ring1X.get( idx );
                 int y = ring1Y.get( idx );
                 
+                placeDie( ring1Dice.get( idx ), diceStillRemaining, x, y);
+            }
+            
+            Collections.shuffle( diceStillRemaining, random );
+            
+            // place ring 2
+            for( int idx = 0; idx < ring2X.size(); idx++ )
+            {
+                int x = ring2X.get( idx );
+                int y = ring2Y.get( idx );
                 
+                placeDie( diceStillRemaining.get( 0 ), diceStillRemaining, x, y );
             }
         }
         
-        private int[] getNextBestDice( int baseDie, int howMany, int[][] dieCountMatrix )
+        private List<Die> getNextBestDice( int baseDie, int howMany, int[][] dieCountMatrix )
         {
-            int[] returnValue = new int[ howMany ];
+            Integer[] returnValue = new Integer[ howMany ];
             Map<Integer, Integer> nextDiceMap = new HashMap<Integer, Integer>();
             
             for( int idx = 0; idx < 25; idx++ )
@@ -350,7 +373,20 @@ public class Board
                     break;
             }
             
-            return returnValue;
+            List<Die> returnDice = new ArrayList<Die>();
+            
+            for( int idx = 0; idx < returnValue.length; idx++ )
+            {
+                for( Die die : availableDice )
+                {
+                    if( die.id == returnValue[idx] )
+                    {
+                        returnDice.add( die );
+                    }
+                }
+            }
+            
+            return returnDice;
         }
         
     public static Map sortByValue(Map unsortMap) 

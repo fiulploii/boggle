@@ -125,6 +125,13 @@ public class Boggle
         public void centerWeightedProbabilityBoard()
         {
             Board board = new Board( dice, tree, random );
+            board.centerWeightedProbabilityBoard( dieCountMatrix );
+            
+            board.print();
+            board.solve();
+            board.score();
+            
+            System.out.println( board.score );
         }
         
 	public void solveRuslansBoard()
@@ -207,7 +214,10 @@ public class Boggle
                 }
                 
                 Date start = new Date();
-		boggle.tryRandomBoards( null, 1000000, 0, 10 );
+		//boggle.tryRandomBoards( null, 1000000, 0, 10 );
+                for( int idx = 0; idx < 10; idx++ )
+                    boggle.centerWeightedProbabilityBoard();
+                
                 Date end = new Date();
                 
                 System.out.println( "Processing started " + start );
