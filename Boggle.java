@@ -57,7 +57,9 @@ public class Boggle
             {
                 for( int idx = 0; idx < word.length() - 1; idx++ )
                 {
-                    charCountMatrix[ word.charAt( idx ) ][ word.charAt( idx + 1 ) ]++;
+                	int x = word.charAt( idx );
+                	int y = word.charAt( idx + 1 );
+                    charCountMatrix[ x ][ y ]++;
                 }
             }
             
@@ -122,17 +124,17 @@ public class Boggle
 		}
 	}
 	
-        public void centerWeightedProbabilityBoard()
-        {
-            Board board = new Board( dice, tree, random );
-            board.centerWeightedProbabilityBoard( dieCountMatrix );
-            
-            board.print();
-            board.solve();
-            board.score();
-            
-            System.out.println( board.score );
-        }
+    public void centerWeightedProbabilityBoard()
+    {
+        Board board = new Board( dice, tree, random );
+        board.centerWeightedProbabilityBoard( dieCountMatrix );
+        
+        board.print();
+        board.solve();
+        board.score();
+        
+        System.out.println( board.score );
+    }
         
 	public void solveRuslansBoard()
 	{
@@ -146,6 +148,39 @@ public class Boggle
 		
 		System.out.println( board.words );
 		System.out.println( board.score );
+	}
+	
+	public void printCharCountMatrix()
+	{
+        for( int x = 96; x <= 122; x++ )
+        {
+            for( int y = 96; y <= 122; y++ )
+            {
+            	if( x == 96 )
+            	{
+            		if( y == 96 )
+            		{
+            			System.out.print( String.format( "%4s ", " " ) );
+            		}
+            		else
+            		{
+            			System.out.print( String.format( "%4s ", String.valueOf( (char)y ) ) );
+            		}
+            	}
+            	else
+            	{
+            		if( y == 96 )
+            		{
+            			System.out.print( String.format( "%4s ",  String.valueOf( (char)x ) ) );
+            		}
+            		else
+            		{
+            			System.out.print( String.format( "%04d ", charCountMatrix[x][y] ) );
+            		}
+            	}
+            }
+            System.out.println("");
+        }
 	}
 	
 	public void tryRandomBoards( Board currentMasterBoard, int howMany, int currentDepth, int maxDepth )
@@ -212,6 +247,8 @@ public class Boggle
                     System.out.println( "Using random seed " + args[0] );
                     boggle.newRandomWithSeed( Long.parseLong( args[0] ) );
                 }
+                
+                boggle.printCharCountMatrix();
                 
                 Date start = new Date();
 		//boggle.tryRandomBoards( null, 1000000, 0, 10 );
